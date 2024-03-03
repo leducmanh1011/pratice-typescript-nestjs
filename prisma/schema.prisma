@@ -7,16 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        Int      @id @default(autoincrement())
-  name      String?
-  gender    Gender?
-  email     String?  @unique
-  role      Role
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
 enum Gender {
   MALE
   FEMALE
@@ -25,4 +15,143 @@ enum Gender {
 enum Role {
   USER
   ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  DEACTIVE
+}
+
+enum TimesheetStatus {
+  WAITING_FOR_APPROVE
+  APPROVED
+  REJECTED
+}
+
+model User {
+  id        Int        @id @default(autoincrement())
+  email     String?    @unique
+  role      Role       @default(USER)
+  status    UserStatus @default(ACTIVE)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  employee  Employee?
+}
+
+model Employee {
+  id                       Int                       @id @default(autoincrement())
+  userId                   Int                       @unique
+  companyId                Int
+  code                     String                    @unique
+  firstName                String?
+  lastName                 String?
+  dateOfBirth              DateTime                  @db.Date
+  gender                   Gender?
+  address                  String?
+  phoneNumber              String?
+  createdAt                DateTime                  @default(now())
+  updatedAt                DateTime                  @updatedAt
+  user                     User                      @relation(fields: [userId], references: [id])
+  company                  Company                   @relation(fields: [companyId], references: [id])
+  timesheets               Timesheet[]
+  employeeCompanyContracts EmployeeCompanyContract[]
+  companyContracts         CompanyContract[]
+}
+
+model Timesheet {
+  id               Int             @id @default(autoincrement())
+  employeeId       Int
+  workingStartTime DateTime
+  workingEndTime   DateTime?
+  status           TimesheetStatus @default(WAITING_FOR_APPROVE)
+  approvedById     Int
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  employee         Employee        @relation(fields: [employeeId], references: [id])
+}
+
+model Company {
+  id                       Int                       @id @default(autoincrement())
+  companyPlanId            Int
+  name                     String                    @unique
+  logo                     String?
+  mLocationId              Int
+  mAreaId                  Int
+  createdAt                DateTime                  @default(now())
+  updatedAt                DateTime                  @updatedAt
+  companyPlan              CompanyPlan               @relation(fields: [companyPlanId], references: [id])
+  mLocation                MLocation                 @relation(fields: [mLocationId], references: [id])
+  mArea                    MArea                     @relation(fields: [mAreaId], references: [id])
+  employees                Employee[]
+  holidays                 Holiday[]
+  employeeCompanyContracts EmployeeCompanyContract[]
+  companyContracts         CompanyContract[]
+}
+
+model Holiday {
+  id          Int      @id @default(autoincrement())
+  companyId   Int
+  date        DateTime @db.Date
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  company     Company  @relation(fields: [companyId], references: [id])
+}
+
+model CompanyPlan {
+  id          Int       @id @default(autoincrement())
+  name        String
+  maxUser     Int
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  companies   Company[]
+}
+
+model CompanyContract {
+  id                       Int                       @id @default(autoincrement())
+  companyId                Int
+  companyCode              String
+  name                     String
+  startDate                DateTime                  @db.Date
+  endDate                  DateTime                  @db.Date
+  description              String?
+  createdAt                DateTime                  @default(now())
+  updatedAt                DateTime                  @updatedAt
+  company                  Company                   @relation(fields: [companyId], references: [id])
+  employeeCompanyContracts EmployeeCompanyContract[]
+  employees                Employee[]
+}
+
+model EmployeeCompanyContract {
+  id                Int             @id @default(autoincrement())
+  employeeId        Int
+  companyId         Int
+  companyContractId Int
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  employee          Employee        @relation(fields: [employeeId], references: [id])
+  company           Company         @relation(fields: [companyId], references: [id])
+  companyContract   CompanyContract @relation(fields: [companyContractId], references: [id])
+}
+
+model MLocation {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  mAreas      MArea[]
+  companies   Company[]
+}
+
+model MArea {
+  id          Int       @id @default(autoincrement())
+  mLocationId Int
+  name        String    @unique
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  mLocation   MLocation @relation(fields: [mLocationId], references: [id])
+  companies   Company[]
 }

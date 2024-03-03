@@ -29,7 +29,10 @@
 ## Installation
 
 ```bash
+$ cp .env.example .env
 $ yarn install
+$ docker compose build
+$ docker compose up -d
 ```
 
 ## Running the app

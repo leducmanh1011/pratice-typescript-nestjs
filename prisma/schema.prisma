@@ -29,13 +29,14 @@ enum TimesheetStatus {
 }
 
 model User {
-  id        Int        @id @default(autoincrement())
-  email     String?    @unique
-  role      Role       @default(USER)
-  status    UserStatus @default(ACTIVE)
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  employee  Employee?
+  id                Int        @id @default(autoincrement())
+  email             String?    @unique
+  encryptedPassword String?
+  role              Role       @default(USER)
+  status            UserStatus @default(ACTIVE)
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+  employee          Employee?
 }
 
 model Employee {
@@ -51,8 +52,8 @@ model Employee {
   phoneNumber              String?
   createdAt                DateTime                  @default(now())
   updatedAt                DateTime                  @updatedAt
-  user                     User                      @relation(fields: [userId], references: [id])
-  company                  Company                   @relation(fields: [companyId], references: [id])
+  user                     User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company                  Company                   @relation(fields: [companyId], references: [id], onDelete: Cascade)
   timesheets               Timesheet[]
   employeeCompanyContracts EmployeeCompanyContract[]
   companyContracts         CompanyContract[]
@@ -67,7 +68,7 @@ model Timesheet {
   approvedById     Int
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
-  employee         Employee        @relation(fields: [employeeId], references: [id])
+  employee         Employee        @relation(fields: [employeeId], references: [id], onDelete: Cascade)
 }
 
 model Company {
@@ -79,9 +80,9 @@ model Company {
   mAreaId                  Int
   createdAt                DateTime                  @default(now())
   updatedAt                DateTime                  @updatedAt
-  companyPlan              CompanyPlan               @relation(fields: [companyPlanId], references: [id])
-  mLocation                MLocation                 @relation(fields: [mLocationId], references: [id])
-  mArea                    MArea                     @relation(fields: [mAreaId], references: [id])
+  companyPlan              CompanyPlan               @relation(fields: [companyPlanId], references: [id], onDelete: Cascade)
+  mLocation                MLocation                 @relation(fields: [mLocationId], references: [id], onDelete: Cascade)
+  mArea                    MArea                     @relation(fields: [mAreaId], references: [id], onDelete: Cascade)
   employees                Employee[]
   holidays                 Holiday[]
   employeeCompanyContracts EmployeeCompanyContract[]
@@ -95,7 +96,7 @@ model Holiday {
   description String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  company     Company  @relation(fields: [companyId], references: [id])
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
 
 model CompanyPlan {
@@ -118,7 +119,7 @@ model CompanyContract {
   description              String?
   createdAt                DateTime                  @default(now())
   updatedAt                DateTime                  @updatedAt
-  company                  Company                   @relation(fields: [companyId], references: [id])
+  company                  Company                   @relation(fields: [companyId], references: [id], onDelete: Cascade)
   employeeCompanyContracts EmployeeCompanyContract[]
   employees                Employee[]
 }
@@ -130,9 +131,9 @@ model EmployeeCompanyContract {
   companyContractId Int
   createdAt         DateTime        @default(now())
   updatedAt         DateTime        @updatedAt
-  employee          Employee        @relation(fields: [employeeId], references: [id])
-  company           Company         @relation(fields: [companyId], references: [id])
-  companyContract   CompanyContract @relation(fields: [companyContractId], references: [id])
+  employee          Employee        @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  company           Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyContract   CompanyContract @relation(fields: [companyContractId], references: [id], onDelete: Cascade)
 }
 
 model MLocation {
@@ -152,6 +153,6 @@ model MArea {
   description String?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  mLocation   MLocation @relation(fields: [mLocationId], references: [id])
+  mLocation   MLocation @relation(fields: [mLocationId], references: [id], onDelete: Cascade)
   companies   Company[]
 }

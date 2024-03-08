@@ -32,6 +32,7 @@ model User {
   id                Int        @id @default(autoincrement())
   email             String?    @unique
   encryptedPassword String?
+  refreshToken      String?
   role              Role       @default(USER)
   status            UserStatus @default(ACTIVE)
   createdAt         DateTime   @default(now())

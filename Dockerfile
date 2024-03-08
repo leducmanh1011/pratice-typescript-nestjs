@@ -11,4 +11,4 @@ COPY . $APP_ROOT
 
 EXPOSE 3000
 
-CMD [ "yarn", "run", "start" ]
+CMD [ "yarn", "run", "start:dev" ]

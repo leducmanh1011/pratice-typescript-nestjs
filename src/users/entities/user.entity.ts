@@ -20,4 +20,6 @@ export class UserEntity implements User {
   updatedAt: Date;
 
   encryptedPassword: string;
+
+  refreshToken: string;
 }

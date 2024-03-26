@@ -63,10 +63,10 @@ model Employee {
 model Timesheet {
   id               Int             @id @default(autoincrement())
   employeeId       Int
-  workingStartTime DateTime
+  workingStartTime DateTime        @default(now())
   workingEndTime   DateTime?
   status           TimesheetStatus @default(WAITING_FOR_APPROVE)
-  approvedById     Int
+  approvedById     Int?
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
   employee         Employee        @relation(fields: [employeeId], references: [id], onDelete: Cascade)

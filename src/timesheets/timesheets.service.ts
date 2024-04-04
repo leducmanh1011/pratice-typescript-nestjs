@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from './../prisma/prisma.service';
+import { TimesheetEntity } from './entities/timesheet.entity';
 import { Logger } from '@nestjs/common';
 
 @Injectable()
 export class TimesheetsService {
   constructor(private prisma: PrismaService) {}
 
-  async create(employeeId: number, currentTimeStr: string) {
+  async create(employeeId: number, currentTimeStr: string): Promise<TimesheetEntity> {
     const employee = await this.prisma.employee.findFirstOrThrow({
       where: {
         id: employeeId,

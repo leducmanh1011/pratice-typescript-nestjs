@@ -6,7 +6,7 @@ import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nest
 import { UserEntity } from './entities/user.entity';
 import { AccessTokenGuard } from '../common/guards/accessToken.guard';
 
-@Controller('users')
+@Controller({ path: 'users', version: '1' })
 @ApiTags('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}

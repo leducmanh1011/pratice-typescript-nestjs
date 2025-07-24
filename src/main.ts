@@ -1,13 +1,25 @@
-import { NestFactory, HttpAdapterHost } from '@nestjs/core';
+import { NestFactory, HttpAdapterHost, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, ClassSerializerInterceptor, VersioningType } from '@nestjs/common';
 import { PrismaClientExceptionFilter } from './prisma-client-exception/prisma-client-exception.filter';
+import { ResolvePromisesInterceptor } from './utils/serializer.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+
+  app.enableVersioning({
+    type: VersioningType.URI,
+  });
+
+  app.useGlobalInterceptors(
+    // ResolvePromisesInterceptor is used to resolve promises in responses because class-transformer can't do it
+    // https://github.com/typestack/class-transformer/issues/549
+    new ResolvePromisesInterceptor(),
+    new ClassSerializerInterceptor(app.get(Reflector), { excludeExtraneousValues: true }),
+  );
 
   const config = new DocumentBuilder()
     .setTitle('MMM')

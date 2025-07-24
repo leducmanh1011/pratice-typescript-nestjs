@@ -7,7 +7,7 @@ import { CurrentUser } from '../common/decorators/currentUser.decorator';
 import { AccessTokenGuard, RefreshTokenGuard } from '../common/guards';
 import { Logger } from '@nestjs/common';
 
-@Controller('auth')
+@Controller({ path: 'auth', version: '1' })
 @ApiTags('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
